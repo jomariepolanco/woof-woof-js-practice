@@ -2,9 +2,26 @@
 const dogBar = document.querySelector("#dog-bar")
 const dogButton = document.querySelector("#good-bad")
 const dogCont = document.querySelector("#dog-summary-container")
+const dogFilter = document.querySelector("#good-dog-filter")
 
 
 //Event Listeners
+
+dogFilter.addEventListener("click", event => {
+    const badDogs = Array.from(dogBar.children).filter(dog => dog.dataset.good === "false")
+    if (event.target.textContent === "Filter good dogs: OFF") {
+        event.target.textContent = "Filter good dogs: ON"
+        badDogs.forEach(dog => {
+        dog.style.display = "none"
+        })
+    } else if (event.target.textContent === "Filter good dogs: ON") {
+        event.target.textContent = "Filter good dogs: OFF"
+        badDogs.forEach(dog => {
+            dog.style.display = ""
+        })
+    }
+})
+
 dogBar.addEventListener("click", event => {
     if (event.target.tagName === "SPAN") {
         getOnePupFetch(event.target.dataset.id)
@@ -37,12 +54,6 @@ const updatePupFetchPatch = (id, pupObj) => {
     .then(resp => resp.json())
     .then(updatePup => renderPupInfo(updatePup))
 }
-
-const getPupsFetch = () => {
-    return fetch('http://localhost:3000/pups')
-        .then(resp => resp.json())
-        .then(pupsData => renderPups(pupsData))
-    }
     
 const getOnePupFetch = (id) => {
     return fetch(`http://localhost:3000/pups/${id}`)
@@ -56,6 +67,7 @@ const renderPups = (pups) => {
     pups.forEach(pup => {
         const span = document.createElement("span")
         span.dataset.id = pup.id 
+        span.dataset.good= pup.isGoodDog
         span.textContent = pup.name 
         dogBar.append(span)
     })
@@ -82,6 +94,8 @@ const renderPupInfo = (pup) => {
 
 //initialize
 const initialize = () => {
-    getPupsFetch()
+    return fetch('http://localhost:3000/pups')
+        .then(resp => resp.json())
+        .then(pupsData => renderPups(pupsData))
 }
 initialize()
